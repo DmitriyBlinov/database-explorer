@@ -9,5 +9,8 @@
         <module name="DatabaseExplorer" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="DatabaseExplorer" target="8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
