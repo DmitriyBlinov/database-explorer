@@ -1,54 +1,64 @@
 package controller;
 
+import data.criteria.HowManyBoughtCriterion;
+import data.criteria.Criterion;
+
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class Operations {
-    private final List<Map<String, ?>> criteria;
+    private final List<Map<String, Object>> criteria;
     private Statement statement;
+    private Criterion criterion;
 
-    public Operations(List<Map<String, ?>> criteria, Statement statement) {
+
+    public Operations(List<Map<String, Object>> criteria, Statement statement) {
         this.criteria = criteria;
         this.statement = statement;
+        criterion = new HowManyBoughtCriterion();
     }
 
     public void doSearch() throws SQLException {
         List<String> queries = new ArrayList<>();
-        for (Map<String, ?> criterion : criteria) {
-            //Поиск покупателей по фамилии
-            if (criterion.containsKey("lastName")) {
-                String lastName = (String)criterion.get("lastName");
-                String query = "SELECT customers.name, \"lastName\" " +
-                        "FROM customers " +
-                        "WHERE \"lastName\" = '" + lastName + "';";
+        for (Map<String, Object> criterion : criteria) {
+            this.criterion = this.criterion.checkCriterionList(criterion);
+            if (!Objects.equals(this.criterion, null)) {
+                String query = this.criterion.prepareQuery();
                 queries.add(query);
-            }
-
-            //Поиск покупателей, купивших этот товар не менее, чем указанное число раз
-            if (criterion.containsKey("productName")) {
-                //TODO
-            }
-
-            //Поиск покупателей, у которых общая стоимость всех покупок за всё время попадает в интервал
-            if (criterion.containsKey("minExpenses")) {
-                //TODO
-            }
-
-            //Поиск покупателей, купивших меньше всего товаров. Возвращается не более, чем указанное число покупателей
-            if (criterion.containsKey("badCustomers")) {
-                //TODO
             }
         }
         if (queries.isEmpty()) {
             return;
         }
 
+        ResultSet resultSet;
         for (String query : queries) {
-            statement.executeQuery(query);
+            resultSet = statement.executeQuery(query);
+            printResultSet(resultSet);
         }
+    }
+
+    private void printResultSet(ResultSet resultSet) {
+        try {
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            while (resultSet.next()) {
+                for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                    if (i > 1) System.out.print(",  ");
+                    String columnValue = resultSet.getString(i);
+                    System.out.print(metaData.getColumnName(i) + ": " + columnValue);
+                }
+                System.out.println();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     public void doStat() {
