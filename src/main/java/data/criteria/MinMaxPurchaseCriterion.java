@@ -29,7 +29,7 @@ public class MinMaxPurchaseCriterion extends Criterion {
         return null;
     }
 
-    public String prepareQuery() {
+    public String prepareSearchQuery() {
         String query = "SELECT customers.name, \"lastName\"\n" +
                 "FROM customers\n" +
                 "JOIN purchases ON customers.id = purchases.\"customerId\"\n" +

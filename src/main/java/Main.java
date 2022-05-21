@@ -1,7 +1,6 @@
-import controller.ConnectDB;
-import controller.JsonParser;
-import controller.Operations;
-import model.Criteria;
+import controller.*;
+import model.JsonCriteria;
+import model.JsonDates;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,25 +12,17 @@ public class Main {
         if (arguments.size() != 3) {
             System.out.printf("Incorrect number of arguments: %s" + ". Expected number of arguments: 3%n", arguments.size());
             //TODO вернуть в самом конце return
-            arguments.add("search");
-            arguments.add("criteria.json");
+            arguments.add("stat");
+            arguments.add("search.json");
             arguments.add("output.json");
             //return;
         }
         String operationType = arguments.get(0);
         String inputJson = arguments.get(1);
         String outputJson = arguments.get(2);
-        System.out.printf("Operation: %s" + ", Input JSON: %s" +", Output JSON: %s%n", operationType, inputJson, outputJson);
-
-        JsonParser parser = new JsonParser();
-        Criteria criteria = parser.parse(inputJson);
-
-        System.out.println(criteria.getCriterion(0));
-
-        //connectDB(root);
+        System.out.printf("Operation: %s" + ", Input JSON: %s" + ", Output JSON: %s%n", operationType, inputJson, outputJson);
 
         ConnectDB connectDB = new ConnectDB();
-
         if (!connectDB.getConnection()) {
             System.out.println("Connection was not set properly");
             return;
@@ -39,8 +30,29 @@ public class Main {
 
         //fillTable(connectDB.getStatement());
 
-        Operations operations = new Operations(criteria.getCriteriaList(), connectDB.getStatement());
-        performOperations(operationType, operations);
+        if (operationType.equals("search")) {
+            JsonSearchParser parser = new JsonSearchParser();
+            JsonCriteria jsonCriteria = parser.parse(inputJson);
+            System.out.println(jsonCriteria.getCriterion(0));
+            SearchOperation searchOperation = new SearchOperation(jsonCriteria.getCriteriaList(), connectDB.getStatement());
+            try {
+                searchOperation.doSearch();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (operationType.equals("stat")) {
+            JsonStatParser parser = new JsonStatParser();
+            JsonDates dates = parser.parse(inputJson);
+            System.out.println("Start date: " + dates.getStartDate() + ", End date: " + dates.getEndDate());
+            StatOperation statOperation = new StatOperation(dates.getStartDate(), dates.getEndDate(), connectDB.getStatement());
+            try {
+                statOperation.doStat();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void fillTable(Statement statement) throws SQLException {
@@ -63,18 +75,19 @@ public class Main {
         statement.executeUpdate(queryInsertOrders);
     }
 
-    public static void performOperations(String operationType, Operations operations) {
+    //TODO delete
+    public static void performOperation(String operationType, SearchOperation searchOperation) {
         switch (operationType) {
             case ("search"):
                 try {
-                    operations.doSearch();
+                    searchOperation.doSearch();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;
             case ("stat"):
                 try {
-                    operations.doStat();
+                    searchOperation.doStat();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

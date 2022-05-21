@@ -25,7 +25,7 @@ public class LastNameCriterion extends Criterion {
         return null;
     }
 
-    public String prepareQuery() {
+    public String prepareSearchQuery() {
         String query = "SELECT customers.name, \"lastName\" " +
                 "FROM customers " +
                 "WHERE \"lastName\" = '" + lastName + "';";

@@ -3,19 +3,10 @@ package data.criteria;
 import java.util.Map;
 
 public abstract class Criterion {
-    private Map<String, Object> criterion;
-
     public abstract Criterion checkCriterion(Map<String, Object> criterion);
+    public abstract String prepareSearchQuery();
 
-    public String prepareQuery() {
-        return "query";
-    }
-
-    public void setCriterion(Map<String, Object> criterion) {
-        this.criterion = criterion;
-    }
-
-    public Criterion checkCriterionList(Map<String, Object> criterion) {
+    public Criterion getCriterionInstance(Map<String, Object> criterion) {
         if (criterion != null &&
                 criterion.containsKey("lastName")
                 && criterion.size() == 1) {

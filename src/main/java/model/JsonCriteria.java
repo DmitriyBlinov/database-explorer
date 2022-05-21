@@ -3,16 +3,16 @@ package model;
 import com.google.gson.annotations.SerializedName;
 import data.criteria.Criterion;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class Criteria {
-
+public class JsonCriteria {
     @SerializedName("criteria")
     private List<Map<String, Object>> criteria;
     private List<Criterion> criteriaList;
 
-    public Criteria() {
+    public JsonCriteria() {
         //нужна кастомная реализация criteria, чтобы сразу появлялся массив критериев
     }
 
@@ -20,7 +20,7 @@ public class Criteria {
         return criteria;
     }
 
-    public Criteria(List<Map<String, Object>> criteria) {
+    public JsonCriteria(List<Map<String, Object>> criteria) {
         this.criteria = criteria;
     }
 

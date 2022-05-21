@@ -7,18 +7,15 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
-public class Operations {
+public class SearchOperation {
     private final List<Map<String, Object>> criteria;
     private Statement statement;
     private Criterion criterion;
 
 
-    public Operations(List<Map<String, Object>> criteria, Statement statement) {
+    public SearchOperation(List<Map<String, Object>> criteria, Statement statement) {
         this.criteria = criteria;
         this.statement = statement;
         criterion = new HowManyBoughtCriterion();
@@ -27,9 +24,9 @@ public class Operations {
     public void doSearch() throws SQLException {
         List<String> queries = new ArrayList<>();
         for (Map<String, Object> criterion : criteria) {
-            this.criterion = this.criterion.checkCriterionList(criterion);
+            this.criterion = this.criterion.getCriterionInstance(criterion);
             if (!Objects.equals(this.criterion, null)) {
-                String query = this.criterion.prepareQuery();
+                String query = this.criterion.prepareSearchQuery();
                 queries.add(query);
             }
         }
