@@ -1,10 +1,10 @@
-package model.criteria;
+package model.criteria.criterion;
 
 import java.util.Map;
 
 public abstract class Criterion {
-    public abstract Criterion checkCriterion(Map<String, Object> criterion);
     public abstract String prepareSearchQuery();
+    public abstract Map<Object, Object> getCriterionConditions();
 
     public Criterion getCriterionInstance(Map<String, Object> criterion) {
         if (criterion != null &&

@@ -1,5 +1,6 @@
 package model.errors;
 
 public interface Error {
-    abstract String getMessage();
+    String getMessage();
+    void writeError();
 }

@@ -5,19 +5,20 @@ import controller.operations.SearchOperation;
 import controller.operations.StatOperation;
 import controller.json.JsonCriteria;
 import controller.json.JsonDates;
+import model.errors.NoOperationError;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Main {
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
         ArrayList<String> arguments = new ArrayList<>(Arrays.asList(args));
         if (arguments.size() != 3) {
             System.out.printf("Incorrect number of arguments: %s" + ". Expected number of arguments: 3%n", arguments.size());
             //TODO вернуть в самом конце return
-            arguments.add("stat");
-            arguments.add("search.json");
+            arguments.add("search");
+            arguments.add("criteria.json");
             arguments.add("output.json");
             //return;
         }
@@ -32,7 +33,7 @@ public class Main {
             return;
         }
 
-        //fillTable(connectDB.getStatement());
+        //TODO delete fillTable(connectDB.getStatement());
 
         if (operationType.equals("search")) {
             JsonSearchParser parser = new JsonSearchParser();
@@ -44,9 +45,7 @@ public class Main {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-
-        if (operationType.equals("stat")) {
+        } else if (operationType.equals("stat")) {
             JsonStatParser parser = new JsonStatParser();
             JsonDates dates = parser.parse(inputJson);
             System.out.println("Start date: " + dates.getStartDate() + ", End date: " + dates.getEndDate());
@@ -56,11 +55,14 @@ public class Main {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else {
+            NoOperationError error = new NoOperationError();
+            error.writeError();
         }
     }
 
     public static void fillTable(Statement statement) throws SQLException {
-        //TODO сделать нормальное заполнение таблицы
+        //TODO copy and delete сделать нормальное заполнение таблицы
         String queryCreateCustomers = "CREATE TABLE IF NOT EXISTS customers(id SERIAL PRIMARY KEY, name varchar(225), \"lastName\" varchar(225));";
         String queryCreateProducts = "CREATE TABLE IF NOT EXISTS products(id SERIAL PRIMARY KEY, name varchar(225), price numeric);";
         String queryCreateOrders = "CREATE TABLE IF NOT EXISTS purchases(\"customerId\" int, \"productName\" varchar(225), \"purchaseDate\" date);";
@@ -91,7 +93,7 @@ public class Main {
                 break;
             case ("stat"):
                 try {
-                    searchOperation.doStat();
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -1,10 +1,15 @@
-package model.criteria;
+package model.criteria.criterion;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.util.HashMap;
 import java.util.Map;
 
 public class MinMaxPurchaseCriterion extends Criterion {
     //Минимальная и максимальная стоимость всех покупок — поиск покупателей, у которых общая стоимость всех покупок за всё время попадает в интервал
+    @SerializedName("minExpenses")
     private Double minExpenses;
+    @SerializedName("maxExpenses")
     private Double maxExpenses;
 
     public MinMaxPurchaseCriterion() {
@@ -16,19 +21,6 @@ public class MinMaxPurchaseCriterion extends Criterion {
         this.maxExpenses = maxExpenses;
     }
 
-    @Override
-    public Criterion checkCriterion(Map<String, Object> criterion) {
-        if (criterion != null &&
-                criterion.containsKey("minExpenses")
-                && criterion.containsKey("maxExpenses")
-                && criterion.size() == 2) {
-            this.minExpenses = (Double) (criterion.get("minExpenses"));
-            this.maxExpenses = (Double) (criterion.get("maxExpenses"));
-            return this;
-        }
-        return null;
-    }
-
     public String prepareSearchQuery() {
         String query = "SELECT customers.name, \"lastName\"\n" +
                 "FROM customers\n" +
@@ -37,6 +29,13 @@ public class MinMaxPurchaseCriterion extends Criterion {
                 "GROUP BY customers.name, \"lastName\"\n" +
                 "HAVING SUM(products.price)>=" + minExpenses + " AND SUM(products.price)<=" + maxExpenses;
         return query;
+    }
+
+    public Map<Object, Object> getCriterionConditions() {
+        Map<Object, Object> temp = new HashMap<>();
+        temp.put("minExpenses", minExpenses);
+        temp.put("maxExpenses", maxExpenses);
+        return temp;
     }
 
     public Double getMinExpenses() {

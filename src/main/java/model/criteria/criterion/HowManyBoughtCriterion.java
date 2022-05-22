@@ -1,30 +1,22 @@
-package model.criteria;
+package model.criteria.criterion;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.util.HashMap;
 import java.util.Map;
 
 public class HowManyBoughtCriterion extends Criterion {
+    @SerializedName("productName")
     private String productName;
+    @SerializedName("minTimes")
     private Double minTimes;
-
-    public HowManyBoughtCriterion() {
-
-    }
 
     public HowManyBoughtCriterion(String productName, Double minTimes) {
         this.productName = productName;
         this.minTimes = minTimes;
     }
 
-    @Override
-    public HowManyBoughtCriterion checkCriterion(Map<String, Object> criterion) {
-        if (criterion != null &&
-                criterion.containsKey("productName")
-                && criterion.containsKey("minTimes")
-                && criterion.size() == 2) {
-            return this;
-        }
-        return null;
-    }
+
 
     public String prepareSearchQuery() {
         String query = "SELECT customers.name, \"lastName\"\n" +
@@ -34,6 +26,13 @@ public class HowManyBoughtCriterion extends Criterion {
                 "GROUP BY customers.name, \"lastName\"\n" +
                 "HAVING COUNT(purchases.\"productName\")>=" + minTimes;
         return query;
+    }
+
+    public Map<Object, Object> getCriterionConditions() {
+        Map<Object, Object> temp = new HashMap<>();
+        temp.put("productName", productName);
+        temp.put("minTimes", minTimes);
+        return temp;
     }
 
     public String getProductName() {

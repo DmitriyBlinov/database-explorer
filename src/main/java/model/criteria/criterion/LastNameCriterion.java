@@ -1,9 +1,13 @@
-package model.criteria;
+package model.criteria.criterion;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.util.HashMap;
 import java.util.Map;
 
 public class LastNameCriterion extends Criterion {
     //Фамилия — поиск покупателей с этой фамилией
+    @SerializedName("lastName")
     private String lastName;
 
     public LastNameCriterion() {
@@ -14,22 +18,18 @@ public class LastNameCriterion extends Criterion {
         this.lastName = lastName;
     }
 
-    @Override
-    public LastNameCriterion checkCriterion(Map<String, Object> criterion) {
-        if (criterion != null &&
-                criterion.containsKey("lastName")
-                && criterion.size() == 1) {
-            this.lastName = criterion.get("lastName").toString();
-            return this;
-        }
-        return null;
-    }
-
     public String prepareSearchQuery() {
         String query = "SELECT customers.name, \"lastName\" " +
                 "FROM customers " +
                 "WHERE \"lastName\" = '" + lastName + "';";
         return query;
+    }
+
+    @Override
+    public Map<Object, Object> getCriterionConditions() {
+        Map<Object, Object> temp = new HashMap<>();
+        temp.put("lastName", lastName);
+        return temp;
     }
 
     public String getLastName() {

@@ -1,9 +1,12 @@
-package model.criteria;
+package model.criteria.criterion;
 
+import com.google.gson.annotations.SerializedName;
+import java.util.HashMap;
 import java.util.Map;
 
-public class PassiveCustomersCriterion extends Criterion{
+public class PassiveCustomersCriterion extends Criterion {
     //Число пассивных покупателей — поиск покупателей, купивших меньше всего товаров. Возвращается не более, чем указанное число покупателей.
+    @SerializedName("badCustomers")
     private Double badCustomers;
 
     public PassiveCustomersCriterion() {
@@ -14,17 +17,6 @@ public class PassiveCustomersCriterion extends Criterion{
         this.badCustomers = badCustomers;
     }
 
-    @Override
-    public Criterion checkCriterion(Map<String, Object> criterion) {
-        if (criterion != null &&
-                criterion.containsKey("badCustomers")
-                && criterion.size() == 1) {
-            this.badCustomers = (Double) (criterion.get("badCustomers"));
-            return this;
-        }
-        return null;
-    }
-
     public String prepareSearchQuery() {
         String query = "SELECT customers.name, \"lastName\"\n" +
                 "FROM customers\n" +
@@ -33,6 +25,12 @@ public class PassiveCustomersCriterion extends Criterion{
                 "ORDER BY COUNT(DISTINCT purchases.\"customerId\")\n" +
                 "LIMIT " + badCustomers;
         return query;
+    }
+
+    public Map<Object, Object> getCriterionConditions() {
+        Map<Object, Object> temp = new HashMap<>();
+        temp.put("badCustomers", badCustomers);
+        return temp;
     }
 
     public Double getBadCustomers() {

@@ -7,13 +7,13 @@ import com.google.gson.annotations.SerializedName;
 import java.io.FileWriter;
 import java.io.Writer;
 
-public class DateError implements Error {
+public class NoConditionsError implements Error {
     @SerializedName("type")
     private String type = "error";
     @SerializedName("message")
-    private final String message = "Wrong date format";
+    private final String message = "No conditions found";
 
-    public DateError() {
+    public NoConditionsError() {
 
     }
 

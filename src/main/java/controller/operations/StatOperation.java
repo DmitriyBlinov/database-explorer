@@ -16,17 +16,19 @@ import java.util.Date;
 import java.util.List;
 
 public class StatOperation {
-    private transient Date startDate;
-    private transient Date endDate;
-    private transient Statement statement;
     @SerializedName("type")
     private final String type = "stat";
     @SerializedName("totalDays")
     private long totalDays;
     @SerializedName("customers")
     private List<Customer> customersList;
+    @SerializedName("totalExpenses")
     private int totalExpenses;
+    @SerializedName("avgExpenses")
     private double avgExpenses;
+    private transient Date startDate;
+    private transient Date endDate;
+    private transient Statement statement;
 
     public StatOperation(Date startDate, Date endDate, Statement statement) {
         this.startDate = startDate;
