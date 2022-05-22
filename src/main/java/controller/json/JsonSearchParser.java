@@ -1,16 +1,15 @@
-package controller;
+package controller.json;
 
 import com.google.gson.Gson;
-import model.JsonDates;
 
 import java.io.FileReader;
 
-public class JsonStatParser {
-    public JsonDates parse(String fileName) {
+public class JsonSearchParser {
+    public JsonCriteria parse(String fileName) {
         Gson gson = new Gson();
 
         try(FileReader reader = new FileReader(fileName)) {
-            return gson.fromJson(reader, JsonDates.class);
+            return gson.fromJson(reader, JsonCriteria.class);
         } catch (Exception e) {
             e.printStackTrace();
         }

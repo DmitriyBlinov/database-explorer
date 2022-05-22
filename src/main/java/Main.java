@@ -1,6 +1,10 @@
-import controller.*;
-import model.JsonCriteria;
-import model.JsonDates;
+import controller.database.DatabaseWorker;
+import controller.json.JsonSearchParser;
+import controller.json.JsonStatParser;
+import controller.operations.SearchOperation;
+import controller.operations.StatOperation;
+import controller.json.JsonCriteria;
+import controller.json.JsonDates;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -22,8 +26,8 @@ public class Main {
         String outputJson = arguments.get(2);
         System.out.printf("Operation: %s" + ", Input JSON: %s" + ", Output JSON: %s%n", operationType, inputJson, outputJson);
 
-        ConnectDB connectDB = new ConnectDB();
-        if (!connectDB.getConnection()) {
+        DatabaseWorker databaseWorker = new DatabaseWorker();
+        if (!databaseWorker.getConnection()) {
             System.out.println("Connection was not set properly");
             return;
         }
@@ -34,7 +38,7 @@ public class Main {
             JsonSearchParser parser = new JsonSearchParser();
             JsonCriteria jsonCriteria = parser.parse(inputJson);
             System.out.println(jsonCriteria.getCriterion(0));
-            SearchOperation searchOperation = new SearchOperation(jsonCriteria.getCriteriaList(), connectDB.getStatement());
+            SearchOperation searchOperation = new SearchOperation(jsonCriteria.getCriteriaList(), databaseWorker.getStatement());
             try {
                 searchOperation.doSearch();
             } catch (Exception e) {
@@ -46,7 +50,7 @@ public class Main {
             JsonStatParser parser = new JsonStatParser();
             JsonDates dates = parser.parse(inputJson);
             System.out.println("Start date: " + dates.getStartDate() + ", End date: " + dates.getEndDate());
-            StatOperation statOperation = new StatOperation(dates.getStartDate(), dates.getEndDate(), connectDB.getStatement());
+            StatOperation statOperation = new StatOperation(dates.getStartDate(), dates.getEndDate(), databaseWorker.getStatement());
             try {
                 statOperation.doStat();
             } catch (Exception e) {

@@ -1,4 +1,4 @@
-package data.criteria;
+package model.criteria;
 
 import java.util.Map;
 

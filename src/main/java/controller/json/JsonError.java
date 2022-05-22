@@ -1,4 +1,4 @@
-package model;
+package controller.json;
 
 public class JsonError {
 }

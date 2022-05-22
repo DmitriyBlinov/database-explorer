@@ -1,7 +1,7 @@
-package controller;
+package controller.operations;
 
-import data.criteria.HowManyBoughtCriterion;
-import data.criteria.Criterion;
+import model.criteria.HowManyBoughtCriterion;
+import model.criteria.Criterion;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -14,6 +14,9 @@ public class SearchOperation {
     private Statement statement;
     private Criterion criterion;
 
+    //TODO запись данных в итоговый json должна выполняться самим критерием, чтобы соблюдался синтаксис
+    //TODO там же сделать поля для записи
+    //TODO !!!!!!!!!!!!!!!
 
     public SearchOperation(List<Map<String, Object>> criteria, Statement statement) {
         this.criteria = criteria;
@@ -55,7 +58,6 @@ public class SearchOperation {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
     }
 
     public void doStat() {

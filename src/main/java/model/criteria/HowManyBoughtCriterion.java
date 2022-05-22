@@ -1,6 +1,5 @@
-package data.criteria;
+package model.criteria;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class HowManyBoughtCriterion extends Criterion {

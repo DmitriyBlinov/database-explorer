@@ -1,10 +1,10 @@
-package controller;
+package controller.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 
-public class ConnectDB {
+public class DatabaseWorker {
     private Connection connection = null;
     private String host = "localhost";
     private String port = "5432";
@@ -13,7 +13,7 @@ public class ConnectDB {
     private String password = "root";
     private Statement statement;
 
-    public ConnectDB() {
+    public DatabaseWorker() {
 
     }
 
