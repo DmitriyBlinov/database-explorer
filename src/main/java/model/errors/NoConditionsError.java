@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.FileWriter;
 import java.io.Writer;
+import java.util.Objects;
 
 public class NoConditionsError implements Error {
     @SerializedName("type")
@@ -28,15 +29,24 @@ public class NoConditionsError implements Error {
 
     public void writeError() {
         try {
-            Writer writer = new FileWriter("output.json");
+            Writer writer = new FileWriter("error.json");
             Gson gson = new GsonBuilder().create();
             gson.toJson(this, writer);
-            String json = gson.toJson(this);
+            System.out.print("Error! Error details were written to the file: error.json");
             writer.flush();
             writer.close();
-            System.out.println(json);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    @Override
+    public boolean checkForError(String... strings) {
+        for (String s : strings) {
+            if (Objects.equals(s, null)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

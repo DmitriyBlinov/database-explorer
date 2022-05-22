@@ -8,13 +8,13 @@ import java.io.FileWriter;
 import java.io.Writer;
 import java.util.Objects;
 
-public class DateError implements Error {
+public class NoDateError implements Error {
     @SerializedName("type")
     private String type = "error";
     @SerializedName("message")
-    private final String message = "Wrong date format";
+    private final String message = "Date not found";
 
-    public DateError() {
+    public NoDateError() {
 
     }
 

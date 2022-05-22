@@ -1,6 +1,8 @@
 package controller.json;
 
 import com.google.gson.Gson;
+import model.json.JsonCriteria;
+
 import java.io.FileReader;
 
 public class JsonSearchParser {

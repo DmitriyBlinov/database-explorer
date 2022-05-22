@@ -1,6 +1,8 @@
 package controller.json;
 
 import com.google.gson.Gson;
+import model.json.JsonDates;
+
 import java.io.FileReader;
 
 public class JsonStatParser {

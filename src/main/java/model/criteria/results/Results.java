@@ -1,4 +1,4 @@
-package model.criteria;
+package model.criteria.results;
 
 import com.google.gson.annotations.SerializedName;
 

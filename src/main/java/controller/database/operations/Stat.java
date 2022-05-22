@@ -1,4 +1,4 @@
-package controller.operations;
+package controller.database.operations;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import model.customer.Purchase;
 import model.customer.Customer;
 import model.errors.DateError;
+import model.errors.NoDateError;
 
 import java.io.FileWriter;
 import java.io.Writer;
@@ -14,8 +15,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
-public class StatOperation {
+public class Stat {
     @SerializedName("type")
     private final String type = "stat";
     @SerializedName("totalDays")
@@ -29,14 +31,18 @@ public class StatOperation {
     private transient Date startDate;
     private transient Date endDate;
     private transient Statement statement;
+    private transient String fileName;
+    private transient String message;
 
-    public StatOperation(Date startDate, Date endDate, Statement statement) {
+    public Stat(Date startDate, Date endDate, Statement statement, String fileName) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.statement = statement;
+        this.fileName = fileName;
+        this.message = "Statistics is ready! Output file name: " + fileName;
     }
 
-    public void doStat() throws SQLException {
+    public void requestStat() throws SQLException {
         if (!checkJsonForErrors()) {
             return;
         }
@@ -111,7 +117,6 @@ public class StatOperation {
                     customersList.add(customer);
                 }
             }
-            System.out.println(customersList);
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
@@ -124,7 +129,6 @@ public class StatOperation {
                 int totalExpenses = resultSet.getInt("totalExpenses");
                 customersList.get(id - 1).setTotalExpenses(totalExpenses);
             }
-            System.out.println(customersList);
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
@@ -136,35 +140,45 @@ public class StatOperation {
                 totalExpenses = resultSet.getInt("totalExpenses");
                 avgExpenses = resultSet.getInt("avgExpenses");
             }
-            System.out.println(totalExpenses + ", " + avgExpenses);
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
     }
 
     private boolean checkJsonForErrors() {
-        boolean isValid = true;
-        if (!startDate.before(endDate)) {
+        if (Objects.equals(startDate, null) || Objects.equals(endDate, null)) {
             try {
-                DateError dateError = new DateError();
-                writeToJson(dateError);
-                isValid = false;
+                NoDateError error = new NoDateError();
+                message = "Error! Error details were written to the file: error.json";
+                fileName = "error.json";
+                writeToJson(error);
+                return false;
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         }
-        return isValid;
+        if (!startDate.before(endDate)) {
+            try {
+                DateError error = new DateError();
+                message = "Error! Error details were written to the file: error.json";
+                fileName = "error.json";
+                writeToJson(error);
+                return false;
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        return true;
     }
 
     public void writeToJson(Object object) {
         try {
-            Writer writer = new FileWriter("output.json");
+            Writer writer = new FileWriter(fileName);
             Gson gson = new GsonBuilder().create();
             gson.toJson(object, writer);
-            String json = gson.toJson(object);
+            System.out.print(message);
             writer.flush();
             writer.close();
-            System.out.println(json);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

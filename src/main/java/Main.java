@@ -1,26 +1,23 @@
 import controller.database.DatabaseWorker;
 import controller.json.JsonSearchParser;
 import controller.json.JsonStatParser;
-import controller.operations.SearchOperation;
-import controller.operations.StatOperation;
-import controller.json.JsonCriteria;
-import controller.json.JsonDates;
+import controller.database.operations.Search;
+import controller.database.operations.Stat;
+import model.errors.NoCriteriaError;
+import model.json.JsonCriteria;
+import model.json.JsonDates;
 import model.errors.NoOperationError;
 
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Main {
     public static void main(String[] args) {
         ArrayList<String> arguments = new ArrayList<>(Arrays.asList(args));
         if (arguments.size() != 3) {
             System.out.printf("Incorrect number of arguments: %s" + ". Expected number of arguments: 3%n", arguments.size());
-            //TODO вернуть в самом конце return
-            arguments.add("search");
-            arguments.add("criteria.json");
-            arguments.add("output.json");
-            //return;
+            return;
         }
         String operationType = arguments.get(0);
         String inputJson = arguments.get(1);
@@ -33,73 +30,32 @@ public class Main {
             return;
         }
 
-        //TODO delete fillTable(connectDB.getStatement());
-
         if (operationType.equals("search")) {
             JsonSearchParser parser = new JsonSearchParser();
             JsonCriteria jsonCriteria = parser.parse(inputJson);
-            System.out.println(jsonCriteria.getCriterion(0));
-            SearchOperation searchOperation = new SearchOperation(jsonCriteria.getCriteriaList(), databaseWorker.getStatement());
+            if (Objects.equals(jsonCriteria.getCriterion(0), null)) {
+                NoCriteriaError noCriteriaError = new NoCriteriaError();
+                noCriteriaError.writeError();
+                return;
+            }
+            Search search = new Search(jsonCriteria.getCriteriaList(), databaseWorker.getStatement(), outputJson);
             try {
-                searchOperation.doSearch();
+                search.search();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else if (operationType.equals("stat")) {
             JsonStatParser parser = new JsonStatParser();
             JsonDates dates = parser.parse(inputJson);
-            System.out.println("Start date: " + dates.getStartDate() + ", End date: " + dates.getEndDate());
-            StatOperation statOperation = new StatOperation(dates.getStartDate(), dates.getEndDate(), databaseWorker.getStatement());
+            Stat stat = new Stat(dates.getStartDate(), dates.getEndDate(), databaseWorker.getStatement(), outputJson);
             try {
-                statOperation.doStat();
+                stat.requestStat();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
             NoOperationError error = new NoOperationError();
             error.writeError();
-        }
-    }
-
-    public static void fillTable(Statement statement) throws SQLException {
-        //TODO copy and delete сделать нормальное заполнение таблицы
-        String queryCreateCustomers = "CREATE TABLE IF NOT EXISTS customers(id SERIAL PRIMARY KEY, name varchar(225), \"lastName\" varchar(225));";
-        String queryCreateProducts = "CREATE TABLE IF NOT EXISTS products(id SERIAL PRIMARY KEY, name varchar(225), price numeric);";
-        String queryCreateOrders = "CREATE TABLE IF NOT EXISTS purchases(\"customerId\" int, \"productName\" varchar(225), \"purchaseDate\" date);";
-        statement.executeUpdate(queryCreateCustomers);
-        statement.executeUpdate(queryCreateProducts);
-        statement.executeUpdate(queryCreateOrders);
-
-        String queryInsertCustomers = "INSERT INTO customers" + "(name, \"lastName\")" + "VALUES ('Ivan', 'Ivanov'), ('Petr', 'Petrov'), ('Boris', 'Borisov')";
-        String queryInsertProducts = "INSERT INTO products" + "(name, price)" + "VALUES ('meat', 10.0), ('mineral_water', 5.0), ('cola', 7.0)";
-        String queryInsertOrders = "INSERT INTO purchases" + "(\"customerId\", \"productName\", \"purchaseDate\")"
-                + "VALUES (1, 'meat', '2022-05-21'), (2, 'mineral_water', '2022-05-21'), (3, 'mineral_water', '2022-05-22'), " +
-                "(1, 'cola', '2022-05-21'), (2, 'cola', '2022-05-21'), (3, 'meat', '2022-05-22'), " +
-                "(1, 'mineral_water', '2022-05-21'), (2, 'cola', '2022-05-21'), (3, 'cola', '2022-05-22')";
-        statement.executeUpdate(queryInsertCustomers);
-        statement.executeUpdate(queryInsertProducts);
-        statement.executeUpdate(queryInsertOrders);
-    }
-
-    //TODO delete
-    public static void performOperation(String operationType, SearchOperation searchOperation) {
-        switch (operationType) {
-            case ("search"):
-                try {
-                    searchOperation.doSearch();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                break;
-            case ("stat"):
-                try {
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                break;
-            default:
-                break;
         }
     }
 }

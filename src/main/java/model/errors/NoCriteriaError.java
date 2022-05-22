@@ -8,13 +8,13 @@ import java.io.FileWriter;
 import java.io.Writer;
 import java.util.Objects;
 
-public class DateError implements Error {
+public class NoCriteriaError implements Error {
     @SerializedName("type")
     private String type = "error";
     @SerializedName("message")
-    private final String message = "Wrong date format";
+    private final String message = "No criteria found";
 
-    public DateError() {
+    public NoCriteriaError() {
 
     }
 
@@ -25,6 +25,16 @@ public class DateError implements Error {
 
     public String getType() {
         return type;
+    }
+
+    @Override
+    public boolean checkForError(String... strings) {
+        for (String s : strings) {
+            if (Objects.equals(s, null)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void writeError() {
@@ -38,15 +48,5 @@ public class DateError implements Error {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-    }
-
-    @Override
-    public boolean checkForError(String... strings) {
-        for (String s : strings) {
-            if (Objects.equals(s, null)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

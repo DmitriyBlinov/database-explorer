@@ -1,9 +1,9 @@
-package controller.operations;
+package controller.database.operations;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
-import model.criteria.*;
+import model.criteria.results.Results;
 import model.criteria.criterion.Criterion;
 import model.criteria.criterion.LastNameCriterion;
 import model.errors.NoConditionsError;
@@ -16,24 +16,24 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
-public class SearchOperation {
+public class Search {
     @SerializedName("type")
-    private final String type = "stat";
+    private final String type = "search";
     @SerializedName("results")
     private List<Results> mainResults;
-    private transient List<Map<String, Object>> responses;
     private transient final List<Map<String, Object>> criteria;
-
     private transient Statement statement;
     private transient Criterion criterion;
+    private transient String fileName;
 
-    public SearchOperation(List<Map<String, Object>> criteria, Statement statement) {
+    public Search(List<Map<String, Object>> criteria, Statement statement, String fileName) {
         this.criteria = criteria;
         this.statement = statement;
-        this.criterion = new LastNameCriterion();
+        this.fileName = fileName;
     }
 
-    public void doSearch() throws SQLException {
+    public void search() throws SQLException {
+        this.criterion = new LastNameCriterion();
         mainResults = new ArrayList<>();
         for (Map<String, Object> criterion : criteria) {
             this.criterion = this.criterion.getCriterionInstance(criterion);
@@ -52,7 +52,7 @@ public class SearchOperation {
             error.writeError();
         }
         ResultSet resultSet = statement.executeQuery(query);
-        responses = new ArrayList<>();
+        List<Map<String, Object>> responses = new ArrayList<>();
 
         Results results = new Results();
         while (resultSet.next()) {
@@ -76,13 +76,12 @@ public class SearchOperation {
 
     public void writeToJson() {
         try {
-            Writer writer = new FileWriter("output.json");
+            Writer writer = new FileWriter(fileName);
             Gson gson = new GsonBuilder().create();
             gson.toJson(this, writer);
-            String json = gson.toJson(this);
+            System.out.print("Search is over! Output file name: " + fileName);
             writer.flush();
             writer.close();
-            System.out.println(json);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

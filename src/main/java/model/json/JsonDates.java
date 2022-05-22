@@ -1,4 +1,4 @@
-package controller.json;
+package model.json;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.Date;

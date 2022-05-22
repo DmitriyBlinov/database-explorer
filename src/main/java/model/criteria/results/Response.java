@@ -1,4 +1,4 @@
-package model.criteria;
+package model.criteria.results;
 
 import java.util.ArrayList;
 import java.util.List;
